@@ -1,0 +1,42 @@
+---
+- hosts: all
+  gather_facts: no
+  serial: 1
+  become: yes
+  vars:
+    azure_conf: "/etc/azure/azure.conf"
+    master_conf: /etc/origin/master/master-config.yaml
+  handlers:
+  - name: restart origin-master-api
+    systemd:
+      state: restarted
+      name: origin-master-api
+
+  - name: restart origin-master-controllers
+    systemd:
+      state: restarted
+      name: origin-master-controllers
+
+  tasks:
+
+  - name: insert the azure config into the master
+    modify_yaml:
+      dest: "{{ master_conf }}"
+      yaml_key: "{{ item.key }}"
+      yaml_value: "{{ item.value }}"
+    with_items:
+    - key: kubernetesMasterConfig.apiServerArguments.cloud-config
+      value:
+      - "{{ azure_conf }}"
+    - key: kubernetesMasterConfig.apiServerArguments.cloud-provider
+      value:
+      - azure
+    - key: kubernetesMasterConfig.controllerArguments.cloud-config
+      value:
+      - "{{ azure_conf }}"
+    - key: kubernetesMasterConfig.controllerArguments.cloud-provider
+      value:
+      - azure
+    notify:
+    - restart origin-master-api
+    - restart origin-master-controllers

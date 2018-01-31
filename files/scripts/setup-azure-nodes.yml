@@ -1,0 +1,22 @@
+---
+- hosts: all
+  serial: 1
+  gather_facts: no
+  become: yes
+  vars:
+    azure_conf: /etc/azure/azure.conf
+    node_conf: /etc/origin/node/node-config.yaml
+
+  tasks:
+  - name: insert the azure config into the node
+    modify_yaml:
+      dest: "{{ node_conf }}"
+      yaml_key: "{{ item.key }}"
+      yaml_value: "{{ item.value }}"
+    with_items:
+    - key: kubeletArguments.cloud-config
+      value:
+      - "{{ azure_conf }}"
+    - key: kubeletArguments.cloud-provider
+      value:
+      - azure
