@@ -28,7 +28,7 @@ Mainly, it deploys the following components:
   - Logging and metrics subsystems (if enabled)
 
 
-# Requeriments
+# Requirements
 - Terraform >= 0.11.1
 - Azure credentials on environment (see `az login` command or alternatives)
 - AWS credentials on environment (see `aws configure` command or alternatives)
